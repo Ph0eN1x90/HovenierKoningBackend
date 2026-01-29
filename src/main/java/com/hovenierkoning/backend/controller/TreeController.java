@@ -1,6 +1,7 @@
 package com.hovenierkoning.backend.controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +26,13 @@ public class TreeController {
 
     @PostMapping("/save")
     public ResponseEntity<Tree> saveTree(@RequestBody Tree tree) {  
-        System.out.println("saveBoom() called with: " + tree);
-        if (tree.getAddress() == null || tree.getAddress().getId() == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
         return new ResponseEntity<>(treeService.saveTree(tree), HttpStatus.CREATED);
     }
 
 
     @GetMapping("/all")
     public List<Tree> getAllTrees() {
-        
         return treeService.getTrees();
     }
 
@@ -55,7 +52,7 @@ public class TreeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTree(@PathVariable("id") long id) {
         treeService.deleteTree(id);
-        return new ResponseEntity<>("Boom deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Tree deleted successfully", HttpStatus.OK);
     }
 
 
@@ -67,9 +64,16 @@ public class TreeController {
 
     @GetMapping("/all/{addressId}")
     public List<Tree> getTreesByAddressID(@PathVariable("addressId") String addressId) {
-        System.out.println("getBomenByAdresId() called with adresId: " + addressId);
+        System.out.println("getTreeByAdresId() called with adresId: " + addressId);
         long addressID = Long.parseLong(addressId);
         return treeService.getTreesByAddressId(addressID);
     }
+
+    // @PostMapping("/saveWithImages")
+    // public ResponseEntity<Tree> saveTreeWithImages(@RequestBody Tree tree) {  
+    //     System.out.println("saveTreeWithImages() called with: " + tree);
+
+    //     return new ResponseEntity<>(treeService.saveTreeWithImages(tree), HttpStatus.CREATED);
+    // }
 
 }

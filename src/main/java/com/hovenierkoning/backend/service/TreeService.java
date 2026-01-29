@@ -12,5 +12,4 @@ public interface TreeService {
     Tree updateTree(Tree tree,long id);
     void deleteTree(long id);
     List<Tree> getTreesByAddressId(long addressId);
-
 }

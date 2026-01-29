@@ -50,9 +50,6 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void deleteAddress(long id) {
-        //check
-        addressRepository.findById(id).orElseThrow(()-> new RuntimeException());
-        //delete
         addressRepository.deleteById(id);
     }
 
