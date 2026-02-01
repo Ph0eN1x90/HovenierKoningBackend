@@ -3,7 +3,6 @@ package com.hovenierkoning.backend.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

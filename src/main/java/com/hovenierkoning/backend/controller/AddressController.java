@@ -1,6 +1,7 @@
 package com.hovenierkoning.backend.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.hovenierkoning.backend.dto.AddressDTO;
+import com.hovenierkoning.backend.mapper.AddressMapper;
 import com.hovenierkoning.backend.model.Address;
 import com.hovenierkoning.backend.service.AddressService;
 
@@ -21,29 +24,39 @@ import com.hovenierkoning.backend.service.AddressService;
 public class AddressController {
 
     @Autowired
-    private AddressService  addressService;
+    private AddressService addressService;
+    
+    @Autowired
+    private AddressMapper addressMapper;
 
     @PostMapping("/save")
-    public ResponseEntity<Address> saveAddress(@RequestBody Address address){
-        System.out.println("saveAdres() called with: " + address);
-        return new ResponseEntity<>(addressService.saveAddress(address),HttpStatus.CREATED);
+    public ResponseEntity<AddressDTO> saveAddress(@RequestBody AddressDTO addressDTO){
+        System.out.println("saveAdres() called with: " + addressDTO);
+        Address address = addressMapper.toEntity(addressDTO);
+        Address savedAddress = addressService.saveAddress(address);
+        return new ResponseEntity<>(addressMapper.toDTO(savedAddress), HttpStatus.CREATED);
     }
 
     @GetMapping("/")	
-    public List<Address> getAllAdressen(){
+    public List<AddressDTO> getAllAdressen(){
         // System.out.println("getAllAdressen() called" + addressService.getAllAddress());
-        return addressService.getAllAddress();
+        return addressService.getAllAddress().stream()
+                .map(addressMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Address> getAddressById(@PathVariable("id") long addressId){
-        return new ResponseEntity<>(addressService.getAddressById(addressId),HttpStatus.OK);
+    public ResponseEntity<AddressDTO> getAddressById(@PathVariable("id") long addressId){
+        Address address = addressService.getAddressById(addressId);
+        return new ResponseEntity<>(addressMapper.toDTO(address), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Address> updateAddress(@PathVariable("id") long addressId,
-                                                   @RequestBody Address address){
-        return new ResponseEntity<>(addressService.updateAddress(address,addressId),HttpStatus.OK);
+    public ResponseEntity<AddressDTO> updateAddress(@PathVariable("id") long addressId,
+                                                   @RequestBody AddressDTO addressDTO){
+        Address address = addressMapper.toEntity(addressDTO);
+        Address updatedAddress = addressService.updateAddress(address, addressId);
+        return new ResponseEntity<>(addressMapper.toDTO(updatedAddress), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -53,9 +66,11 @@ public class AddressController {
     }
 
     @GetMapping("/street/{streetname}")
-    public List<Address> findAllByName(@PathVariable("streetname") String streetname){
+    public List<AddressDTO> findAllByName(@PathVariable("streetname") String streetname){
         System.out.println("getAdressesByName() called with straatnaam: " + streetname);
-        return addressService.getAddressesByStreetname(streetname);
+        return addressService.getAddressesByStreetname(streetname).stream()
+                .map(addressMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 }

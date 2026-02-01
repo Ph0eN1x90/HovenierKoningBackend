@@ -2,7 +2,10 @@ package com.hovenierkoning.backend.service.impl;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import com.hovenierkoning.backend.event.TreeDeletedEvent;
+import com.hovenierkoning.backend.event.TreeSavedEvent;
 import com.hovenierkoning.backend.model.Tree;
 import com.hovenierkoning.backend.model.TreeImage;
 import com.hovenierkoning.backend.repository.TreeImageRepo;
@@ -16,6 +19,8 @@ public class TreeServiceImpl implements TreeService {
     private TreeRepo treeRepo;
     @Autowired
     private TreeImageRepo treeImageRepo;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Saves a tree entity to the database along with its associated tree images.
@@ -37,6 +42,9 @@ public class TreeServiceImpl implements TreeService {
             treeImageRepo.saveAll(treeImages);
             savedTree.setTreeimage(treeImages);
         }
+        
+        // Publish event to update address.finished status
+        eventPublisher.publishEvent(new TreeSavedEvent(savedTree));
         
         return savedTree;
     }
@@ -67,31 +75,45 @@ public class TreeServiceImpl implements TreeService {
         existingTree.setFinished(tree.getFinished());
         existingTree.setAddress(tree.getAddress());
         
-        // Handle tree images - delete old ones
-        if (existingTree.getTreeimage() != null && !existingTree.getTreeimage().isEmpty()) {
-            treeImageRepo.deleteAll(existingTree.getTreeimage());
+        // Handle tree images - clear and repopulate the same collection
+        if (existingTree.getTreeimage() != null) {
             existingTree.getTreeimage().clear();
+        }
+        
+        // Add new tree images to the existing collection
+        if (tree.getTreeimage() != null && !tree.getTreeimage().isEmpty()) {
+            tree.getTreeimage().forEach(image -> {
+                image.setTree(existingTree);
+                image.setId(null); // Ensure new images get new IDs
+            });
+            if (existingTree.getTreeimage() == null) {
+                existingTree.setTreeimage(tree.getTreeimage());
+            } else {
+                existingTree.getTreeimage().addAll(tree.getTreeimage());
+            }
         }
         
         // Save updated tree (JPA will UPDATE because entity already has an ID)
         Tree updatedTree = treeRepo.save(existingTree);
         
-        // Add new tree images
-        if (tree.getTreeimage() != null && !tree.getTreeimage().isEmpty()) {
-            tree.getTreeimage().forEach(image -> {
-                image.setTree(updatedTree);
-                image.setId(null); // Ensure new images get new IDs
-            });
-            List<TreeImage> savedImages = treeImageRepo.saveAll(tree.getTreeimage());
-            updatedTree.setTreeimage(savedImages);
-        }
+        // Publish event to update address.finished status
+        eventPublisher.publishEvent(new TreeSavedEvent(updatedTree));
         
         return updatedTree;
     }
 
     @Override
     public void deleteTree(long id) {
+        // Get tree to retrieve address id before deletion
+        Tree tree = treeRepo.findById(id).orElse(null);
+        Long addressId = (tree != null && tree.getAddress() != null) ? tree.getAddress().getId() : null;
+        
         treeRepo.deleteById(id);
+        
+        // Publish event to update address.finished status
+        if (addressId != null) {
+            eventPublisher.publishEvent(new TreeDeletedEvent(addressId));
+        }
     }
 
     @Override
