@@ -1,8 +1,13 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.5.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("checkstyle")
+	id("com.github.spotbugs") version "6.0.26"
 }
 
 group = "com.hovenierkoning"
@@ -52,10 +57,26 @@ checkstyle {
 	configFile = file("config/checkstyle/checkstyle.xml")
 }
 
+spotbugs {
+	toolVersion.set("4.9.3")
+	ignoreFailures.set(true)
+	effort.set(Effort.DEFAULT)
+	reportLevel.set(Confidence.MEDIUM)
+}
+
 tasks.checkstyleMain {
 	ignoreFailures = false
 }
 
+tasks.withType<SpotBugsTask>().configureEach {
+	reports.create("html") {
+		required.set(true)
+	}
+	reports.create("xml") {
+		required.set(false)
+	}
+}
+
 tasks.build {
-	dependsOn("checkstyleMain")
+	dependsOn("checkstyleMain", "spotbugsMain")
 }
