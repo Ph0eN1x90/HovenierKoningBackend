@@ -1,5 +1,6 @@
 package com.hovenierkoning.backend.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address saveAddress(Address address){
+        if (address == null) {
+            throw new IllegalArgumentException("Address cannot be null");
+        }
         return addressRepository.save(address);
     }
 
@@ -56,5 +60,30 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<Address> getAddressesByStreetname(String streetname) {
         return addressRepository.getAddressesByStreetname(streetname);
+    }
+    
+    @Override
+    public void bulkFinishAddresses(List<Long> ids) {
+        if (ids == null) {
+            throw new IllegalArgumentException("IDs cannot be null");
+        }
+        List<Address> addresses = addressRepository.findAllById(ids);
+        LocalDate today = LocalDate.now();
+        
+        addresses.forEach(address -> {
+            // Mark address as finished
+            address.setFinished(true);
+            address.setDate_finished(today);
+            
+            // Mark all trees of this address as finished with date
+            if (address.getTrees() != null && !address.getTrees().isEmpty()) {
+                address.getTrees().forEach(tree -> {
+                    tree.setFinished(true);
+                    tree.setDate_finished(today);
+                });
+            }
+        });
+        
+        addressRepository.saveAll(addresses);
     }
 }

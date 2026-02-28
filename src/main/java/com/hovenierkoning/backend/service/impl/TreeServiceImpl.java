@@ -33,6 +33,15 @@ public class TreeServiceImpl implements TreeService {
     @Override
     public Tree saveTree(Tree tree) {
 
+        // Set date_finished based on finished status
+        if (tree.getFinished() != null && tree.getFinished()) {
+            if (tree.getDate_finished() == null) {
+                tree.setDate_finished(java.time.LocalDate.now());
+            }
+        } else {
+            tree.setDate_finished(null);
+        }
+
         List<TreeImage> treeImages = tree.getTreeimage();
         tree.setTreeimage(null);
         Tree savedTree = treeRepo.save(tree);
@@ -74,6 +83,15 @@ public class TreeServiceImpl implements TreeService {
         existingTree.setDate_finished(tree.getDate_finished());
         existingTree.setFinished(tree.getFinished());
         existingTree.setAddress(tree.getAddress());
+        
+        // Set date_finished based on finished status
+        if (existingTree.getFinished() != null && existingTree.getFinished()) {
+            if (existingTree.getDate_finished() == null) {
+                existingTree.setDate_finished(java.time.LocalDate.now());
+            }
+        } else {
+            existingTree.setDate_finished(null);
+        }
         
         // Handle tree images - clear and repopulate the same collection
         if (existingTree.getTreeimage() != null) {
@@ -125,18 +143,5 @@ public class TreeServiceImpl implements TreeService {
     public List<Tree> getTreesByAddressId(long addressId) {
         return treeRepo.getTreeByAddressId(addressId);
     }
-
-    // @Override
-    // public Tree saveTreeWithImages(Tree tree) {
-
-    //     // List<TreeImage> treeImages = tree.getTreeimage();
-    //     // tree.setTreeimage(null);
-    //     // Tree savedTree = treeRepo.save(tree);
-    //     // savedTree.setTreeimage(treeImageRepo.saveAll(treeImages));                                      // TODO: de tree ids missen in treeimages.
-    //     // System.out.print("test" + savedTree);
-    //     // return savedTree;
-
-    //     return treeRepo.save(tree);
-    // }
 
 }  

@@ -1,5 +1,7 @@
 package com.hovenierkoning.backend.event;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,7 @@ public class TreeEventListener {
         Tree tree = event.getTree();
         
         if (tree.getAddress() != null && tree.getAddress().getId() != null) {
-            Long addressId = tree.getAddress().getId();
+            long addressId = tree.getAddress().getId();
             
             // Reload address from database to get the trees collection
             Address address = addressRepository.findById(addressId).orElse(null);
@@ -31,9 +33,15 @@ public class TreeEventListener {
                 boolean allFinished = address.getTrees().stream()
                     .allMatch(t -> t.getFinished() != null && t.getFinished());
                 
-                // Update address.finished to match actual tree status
+                // Update address.finished and date_finished to match actual tree status
                 if (address.getFinished() != allFinished) {
                     address.setFinished(allFinished);
+                    // Set date_finished only when all trees are finished
+                    if (allFinished) {
+                        address.setDate_finished(LocalDate.now());
+                    } else {
+                        address.setDate_finished(null);
+                    }
                     addressRepository.save(address);
                 }
             }
@@ -46,8 +54,9 @@ public class TreeEventListener {
         Long addressId = event.getAddressId();
         
         if (addressId != null) {
+            long nonNullAddressId = addressId;
             // Reload address from database to get the remaining trees
-            Address address = addressRepository.findById(addressId).orElse(null);
+            Address address = addressRepository.findById(nonNullAddressId).orElse(null);
             
             if (address != null) {
                 // Check if there are remaining trees
@@ -55,6 +64,7 @@ public class TreeEventListener {
                     // No trees left, set address to not finished
                     if (address.getFinished()) {
                         address.setFinished(false);
+                        address.setDate_finished(null);
                         addressRepository.save(address);
                     }
                 } else {
@@ -62,9 +72,14 @@ public class TreeEventListener {
                     boolean allFinished = address.getTrees().stream()
                         .allMatch(t -> t.getFinished() != null && t.getFinished());
                     
-                    // Update address.finished to match actual tree status
+                    // Update address.finished and date_finished to match actual tree status
                     if (address.getFinished() != allFinished) {
                         address.setFinished(allFinished);
+                        if (allFinished) {
+                            address.setDate_finished(LocalDate.now());
+                        } else {
+                            address.setDate_finished(null);
+                        }
                         addressRepository.save(address);
                     }
                 }

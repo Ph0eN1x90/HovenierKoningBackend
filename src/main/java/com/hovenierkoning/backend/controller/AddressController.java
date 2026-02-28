@@ -2,6 +2,7 @@ package com.hovenierkoning.backend.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.hovenierkoning.backend.dto.AddressDTO;
+import com.hovenierkoning.backend.dto.BulkFinishRequest;
 import com.hovenierkoning.backend.mapper.AddressMapper;
 import com.hovenierkoning.backend.model.Address;
 import com.hovenierkoning.backend.service.AddressService;
 
 @RestController
-// @CrossOrigin(origins = "http://localhost:9000") // Allow requests from the frontend
 @RequestMapping("/api/address")
 public class AddressController {
 
@@ -30,7 +31,7 @@ public class AddressController {
     private AddressMapper addressMapper;
 
     @PostMapping("/save")
-    public ResponseEntity<AddressDTO> saveAddress(@RequestBody AddressDTO addressDTO){
+    public ResponseEntity<AddressDTO> saveAddress(@RequestBody @Valid AddressDTO addressDTO){
         System.out.println("saveAdres() called with: " + addressDTO);
         Address address = addressMapper.toEntity(addressDTO);
         Address savedAddress = addressService.saveAddress(address);
@@ -53,7 +54,7 @@ public class AddressController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AddressDTO> updateAddress(@PathVariable("id") long addressId,
-                                                   @RequestBody AddressDTO addressDTO){
+                                                   @RequestBody @Valid AddressDTO addressDTO){
         Address address = addressMapper.toEntity(addressDTO);
         Address updatedAddress = addressService.updateAddress(address, addressId);
         return new ResponseEntity<>(addressMapper.toDTO(updatedAddress), HttpStatus.OK);
@@ -71,6 +72,13 @@ public class AddressController {
         return addressService.getAddressesByStreetname(streetname).stream()
                 .map(addressMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+    
+    @PutMapping("/bulk-finish")
+    public ResponseEntity<String> bulkFinishAddresses(@RequestBody @Valid BulkFinishRequest request){
+        System.out.println("bulkFinishAddresses() called with IDs: " + request.getIds());
+        addressService.bulkFinishAddresses(request.getIds());
+        return new ResponseEntity<>("Addresses marked as finished successfully.", HttpStatus.OK);
     }
 
 }

@@ -47,6 +47,6 @@ public class Tree {
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
-    @OneToMany(mappedBy = "tree", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tree", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
     private List<TreeImage> treeimage;  
 }

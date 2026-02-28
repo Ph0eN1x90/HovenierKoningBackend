@@ -20,28 +20,34 @@ public class TreeImageServiceImpl implements TreeImageService {
     }
 
     @Override
-    public TreeImage getTreeImageById(Long id) {
+    public TreeImage getTreeImageById(long id) {
         return treeImageRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("TreeImage not found with id: " + id));
     }
 
     @Override
-    public List<TreeImage> getTreeImagesByTreeId(Long treeId) {
+    public List<TreeImage> getTreeImagesByTreeId(long treeId) {
         return treeImageRepo.findAllByTreeId(treeId);
     }
 
     @Override
-    public TreeImage saveTreeImage(TreeImage treeImage) {
+    public TreeImage saveTreeImage( TreeImage treeImage) {
+        if (treeImage == null) {
+            throw new IllegalArgumentException("TreeImage cannot be null");
+        }
         return treeImageRepo.save(treeImage);
     }
 
     @Override
-    public void saveTreeImages(List<TreeImage> treeImages) {
-        treeImageRepo.saveAll(treeImages);
+    public List<TreeImage> saveTreeImages( List<TreeImage> treeImages) {
+        if (treeImages == null) {
+            throw new IllegalArgumentException("TreeImages cannot be null");
+        }
+        return treeImageRepo.saveAll(treeImages);
     }
 
     @Override
-    public TreeImage updateTreeImage(TreeImage treeImage, Long id) {
+    public TreeImage updateTreeImage( TreeImage treeImage, long id) {
         return treeImageRepo.findById(id)
                 .map(existingTreeImage -> {
                     existingTreeImage.setId(treeImage.getId());
@@ -52,12 +58,12 @@ public class TreeImageServiceImpl implements TreeImageService {
     }
 
     @Override
-    public void deleteTreeImage(Long id) {
+    public void deleteTreeImage( long id) {
         treeImageRepo.deleteById(id);
     }
 
     @Override
-    public void deleteTreeImagesByTreeId(Long treeId) {
+    public void deleteTreeImagesByTreeId( long treeId) {
         treeImageRepo.deleteByTreeId(treeId);
     }
     

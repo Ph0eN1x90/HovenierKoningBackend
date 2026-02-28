@@ -1,5 +1,6 @@
 package com.hovenierkoning.backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TreeImageDTO {
-    private Long id;
+    private long id;
+    @NotBlank
     private String imageurl;
     private String description;
 }

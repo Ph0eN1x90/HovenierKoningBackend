@@ -3,6 +3,7 @@ package com.hovenierkoning.backend.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class TreeController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<TreeDTO> saveTree(@RequestBody TreeDTO treeDTO) {
+    public ResponseEntity<TreeDTO> saveTree(@RequestBody @Valid TreeDTO treeDTO) {
         Tree tree = treeMapper.toEntity(treeDTO);
         Tree savedTree = treeService.saveTree(tree);
         return new ResponseEntity<>(treeMapper.toDTO(savedTree), HttpStatus.CREATED);
@@ -54,7 +55,7 @@ public class TreeController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<TreeDTO> updateTree(@PathVariable("id") long id, @RequestBody TreeDTO treeDTO) {
+    public ResponseEntity<TreeDTO> updateTree(@PathVariable("id") long id, @RequestBody @Valid TreeDTO treeDTO) {
         Tree tree = treeMapper.toEntity(treeDTO);
         Tree updatedTree = treeService.updateTree(tree, id);
         return new ResponseEntity<>(treeMapper.toDTO(updatedTree), HttpStatus.OK);

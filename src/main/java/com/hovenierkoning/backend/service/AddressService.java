@@ -11,5 +11,6 @@ public interface AddressService {
     List<Address> getAddressesByStreetname(String streetName);
     Address updateAddress(Address address,long id);
     void deleteAddress(long id);
+    void bulkFinishAddresses(List<Long> ids);
 
 }
