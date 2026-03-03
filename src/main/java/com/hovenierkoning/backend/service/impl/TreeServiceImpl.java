@@ -47,7 +47,10 @@ public class TreeServiceImpl implements TreeService {
         Tree savedTree = treeRepo.save(tree);
         
         if (treeImages != null && !treeImages.isEmpty()) {
-            treeImages.forEach(image -> image.setTree(savedTree));
+            treeImages.forEach(image -> {
+                image.setId(null);
+                image.setTree(savedTree);
+            });
             treeImageRepo.saveAll(treeImages);
             savedTree.setTreeimage(treeImages);
         }

@@ -20,6 +20,7 @@ public interface TreeImageMapper {
     @Mapping(source = "imageurl", target = "imageurl")
     @Mapping(target = "tree", ignore = true)
     @Mapping(target = "created", ignore = true)
+    @Mapping(target = "id", ignore = true)
     TreeImage toEntity(TreeImageDTO treeImageDTO);
 
     List<TreeImage> toEntities(List<TreeImageDTO> treeImageDTOs);

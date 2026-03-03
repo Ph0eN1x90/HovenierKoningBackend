@@ -50,7 +50,6 @@ public class TreeImageServiceImpl implements TreeImageService {
     public TreeImage updateTreeImage( TreeImage treeImage, long id) {
         return treeImageRepo.findById(id)
                 .map(existingTreeImage -> {
-                    existingTreeImage.setId(treeImage.getId());
                     existingTreeImage.setImageurl(treeImage.getImageurl());
                     return treeImageRepo.save(existingTreeImage);
                 })
