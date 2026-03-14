@@ -19,8 +19,10 @@ import com.hovenierkoning.backend.dto.BulkFinishRequest;
 import com.hovenierkoning.backend.mapper.AddressMapper;
 import com.hovenierkoning.backend.model.Address;
 import com.hovenierkoning.backend.service.AddressService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Address", description = "Endpoints for managing addresses")
 @RequestMapping("/api/address")
 public class AddressController {
 

@@ -19,8 +19,10 @@ import com.hovenierkoning.backend.dto.TreeDTO;
 import com.hovenierkoning.backend.mapper.TreeMapper;
 import com.hovenierkoning.backend.model.Tree;
 import com.hovenierkoning.backend.service.TreeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Tree", description = "Endpoints for managing trees")
 @RequestMapping("/api/trees")
 public class TreeController {
 
@@ -48,7 +50,7 @@ public class TreeController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<TreeDTO> getBoomById(@PathVariable("id") long id) {
+    public ResponseEntity<TreeDTO> getTreeById(@PathVariable("id") long id) {
         Tree tree = treeService.getTreeById(id);
         return new ResponseEntity<>(treeMapper.toDTO(tree), HttpStatus.OK);
     }

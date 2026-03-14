@@ -17,8 +17,10 @@ import com.hovenierkoning.backend.dto.TreeImageDTO;
 import com.hovenierkoning.backend.mapper.TreeImageMapper;
 import com.hovenierkoning.backend.model.TreeImage;
 import com.hovenierkoning.backend.service.TreeImageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "TreeImage", description = "Endpoints for managing tree images")
 @RequestMapping("/api/tree-images")
 public class TreeImageController {
     
